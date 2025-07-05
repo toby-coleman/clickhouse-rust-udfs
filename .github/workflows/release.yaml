@@ -23,7 +23,7 @@ jobs:
     - name: Create release artifacts
       run: |
         mkdir -p artifacts
-        cp -r target/release/. artifacts/
+        find target/release -maxdepth 1 ! -name '*.*' -type f | xargs -I {} cp {} artifacts/
         cp -r configs/. artifacts/
     
     - name: Create GitHub Release
