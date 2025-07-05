@@ -38,4 +38,4 @@ LIMIT 10;
 
 ## How it works
 
-Each binary will read binary data from ClickHouse via stdin. When it receives enough bytes for all the input args, it will compute the output and send it to stdout. If ClickHouse send EOF, this indicates that the process can exit.
+Each binary will read binary data from ClickHouse via stdin. When it receives enough bytes for all the input args, it will compute the output and send it to stdout. If ClickHouse sends an end-of-file indicator then the process will exit.
