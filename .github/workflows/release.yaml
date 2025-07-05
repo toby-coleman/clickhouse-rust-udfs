@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build release binaries
+      run: cargo build --release --verbose
+    
+    - name: Create release artifacts
+      run: |
+        mkdir -p artifacts
+        cp target/release artifacts/
+        cp config artifacts/
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          artifacts/*
+        body: |
+          ## ClickHouse UDFs Release ${{ github.ref_name }}
+                    
+          ### Usage
+          Install the binaries as ClickHouse UDFs, along with the XML config. See [here](https://clickhouse.com/docs/sql-reference/functions/udf).
+        draft: false
+        prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
