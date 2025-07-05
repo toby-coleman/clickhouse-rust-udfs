@@ -21,7 +21,7 @@ jobs:
       run: |
         mkdir -p artifacts
         cp -r target/release/. artifacts/
-        cp -r config/. artifacts/
+        cp -r configs/. artifacts/
     
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
