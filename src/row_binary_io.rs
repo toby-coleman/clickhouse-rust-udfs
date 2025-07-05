@@ -1,6 +1,7 @@
 //! Row Binary IO utilities for parsing and serializing binary data rows.
 
 use std::convert::TryInto;
+use std::io::Read;
 
 pub enum DataType {
     U32,
@@ -62,6 +63,45 @@ pub fn serialize_parsed_values(values: &[ParsedValue]) -> Vec<u8> {
         }
     }
     bytes
+}
+
+pub fn read_and_parse_from_reader<R: Read>(
+    mut reader: R,
+    types: &[DataType],
+) -> Result<Vec<ParsedValue>, String> {
+    // Count the number of bytes needed for all types
+    let num_bytes: usize = types
+        .iter()
+        .map(|t| match t {
+            DataType::U32 => 4,
+            DataType::U16 => 2,
+            DataType::U8 => 1,
+        })
+        .sum();
+    let mut buf = Vec::with_capacity(num_bytes);
+    while buf.len() < num_bytes {
+        let mut byte = [0u8; 1];
+        match reader.read_exact(&mut byte) {
+            Ok(_) => {
+                if byte[0] != b'\n' {
+                    buf.push(byte[0]);
+                }
+            }
+            Err(e) => return Err(format!("Failed to read from reader: {}", e)),
+        }
+    }
+    parse_bytes_by_types(&buf, types)
+}
+
+pub fn calculate_bytes_needed(types: &[DataType]) -> usize {
+    types
+        .iter()
+        .map(|t| match t {
+            DataType::U32 => 4,
+            DataType::U16 => 2,
+            DataType::U8 => 1,
+        })
+        .sum()
 }
 
 #[cfg(test)]
