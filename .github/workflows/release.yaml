@@ -20,8 +20,8 @@ jobs:
     - name: Create release artifacts
       run: |
         mkdir -p artifacts
-        cp target/release artifacts/
-        cp config artifacts/
+        cp -r target/release/. artifacts/
+        cp -r config/. artifacts/
     
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
