@@ -7,6 +7,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  target: x86_64-unknown-linux-musl
 
 jobs:
   build-release:
@@ -16,14 +17,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Add target
+      run: rustup target add ${{ env.target }}
     
     - name: Build release binaries
-      run: cargo build --release --verbose
+      run: cargo build --release --target ${{ env.target }} --verbose
     
     - name: Create release artifacts
       run: |
         mkdir -p artifacts
-        find target/release -maxdepth 1 ! -name '*.*' -type f | xargs -I {} cp {} artifacts/
+        find target/${{ env.target }}/release -maxdepth 1 ! -name '*.*' -type f | xargs -I {} cp {} artifacts/
         cp -r configs/. artifacts/
     
     - name: Create GitHub Release
